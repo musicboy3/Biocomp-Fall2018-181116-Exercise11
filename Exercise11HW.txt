@@ -1,0 +1,20 @@
+#Upload the directory from local to the remote <-usar
+scp -r /mnt/c/Users/elkid/Desktop/Biocomputing/Biocomp-Fall2018-181116-Exercise11 jwharto1@remote108.helios.nd.edu:/afs/nd.edu/user29/jwharto1
+
+#create a shell script (script.sh). This script will use a for loop to align the sequences using muscle
+nano script.sh
+for f in $(ls Exercise11/gene_sequences/*.fasta); do
+  muscle -in $f -out ${f%.fasta}.align;
+done
+
+#create a shell script (transprof.sh) for making hmm profiles of transporter0*
+nano transprof.sh
+for g in $(ls Exercise11/gene_sequences/transporter0*.align);do
+/afs/nd.edu/user29/jwharto1/local/bin/hmmbuild ${g%.align}.hmm $g;
+done
+
+#shell script (final.sh) for searching the bacterial proteomes for hits
+nano final.sh
+for i in $(ls ~/Exercise11/gene_sequences/*.hmm); do
+/afs/nd.edu/user29/jwharto1/local/bin/hmmsearch --tblout ${i%.hmm}.hits ~/Exercise11/gene_sequences/transporter0*.hmm ~/Exercise11/proteomes/*.fasta | echo ${i%.hmm}.hits | grep -v "#" | wc -l;
+done
